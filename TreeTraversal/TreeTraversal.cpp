@@ -17,6 +17,7 @@ struct TNode {
 
 int min(int a, int b) { return a < b ? a : b; }
 int max(int a, int b) { return a > b ? a : b; } 
+
 TNode* newNode(int val)
 {
 	TNode* temp = new TNode();
@@ -39,7 +40,7 @@ void preOrder_Recursive(TNode* root)
 void preOrder_Iterative(TNode* root)
 {
 	if (!root) return;
-	//keeping moving left and pring the node..and push the right subtree into stack
+	//keeping moving left and print the node..and push the right subtree into stack
 	stack<TNode*> s;
 	TNode* curr = root;
 	while (!s.empty() || curr)
@@ -95,6 +96,45 @@ void InOrder_Iterative(TNode* root)
 		}
 	}
 	cout << endl;
+}
+
+void InOrder_MorrisTraversal(TNode* root) //Inorder traversal without re-cursion and stack
+{
+	//Morris traversal is InOrder traversal without recursion and stack
+	if (!root) return;
+
+	TNode* curr = root;
+
+	while (curr)
+	{
+		if (!curr->left)
+		{
+			//print the curr node
+			cout << curr->key << " ";
+			curr = curr->right;
+		}
+		else {
+			//Find the inorder predecessor of curr -> right most node in the left sub-tree
+			TNode* pre = curr->left;
+			while (pre->right && pre->right != curr)
+			{
+				pre = pre->right;
+			}
+			//Make curr as the right child of its inorder predecessor
+			if (pre->right == NULL)
+			{
+				pre->right = curr;
+				curr = curr->left;
+			}
+			else {
+				//Revert the changes;
+				pre->right = NULL;
+				cout << curr->key << " ";
+				curr = curr->right;
+			}
+		}
+	}
+
 }
 
 void postOrder_Recursive(TNode* root)
@@ -269,6 +309,7 @@ void width(TNode* node, int w, int &minW, int &maxW)
 	width(node->left, w - 1, minW, maxW);
 	width(node->right, w + 1, minW, maxW);
 }
+
 void printNodeAtWidth(TNode* node, int currW, int W)
 {
 	if (!node) return;
@@ -279,6 +320,7 @@ void printNodeAtWidth(TNode* node, int currW, int W)
 	printNodeAtWidth(node->left, currW - 1, W);
 	printNodeAtWidth(node->right, currW + 1, W);
 }
+
 void verticalOrder(TNode* root)
 {
 	if (!root) return;
@@ -326,7 +368,7 @@ void verticalOrder_levelOrder(TNode* root)
 	if (!root) return;
 	//visit nodes in level order and update their hd
 	map<int, vector<int> > m; //<HD, nodes>
-	queue<pair<TNode*, int> > Q;
+	queue<pair<TNode*, int> > Q; //<Node, HD>
 	TNode* curr = root;
 	Q.push(make_pair(curr, 0));
 	while (!Q.empty())
@@ -366,7 +408,8 @@ int main()
 	root->right->right = newNode(40);
 
 	cout << "Inorder Recursive:     "; InOrder_Recursive(root); cout << endl;
-	cout << "Inorder Iterative:     "; InOrder_Iterative(root);
+	cout << "Inorder Iterative:     "; InOrder_Iterative(root); 
+	cout << "Inorder Morris   :     "; InOrder_MorrisTraversal(root); cout << endl;
 	cout << endl;
 
 	cout << "Preorder Recursive:    "; preOrder_Recursive(root); cout << endl;
@@ -386,9 +429,6 @@ int main()
 	cout << "verticalOrder :        "; verticalOrder(root);
 	cout << "verticalOrder_HashMap: "; verticalOrder_HashMap(root);
 	cout << "verticalOrder_levelOrder: "; verticalOrder_levelOrder(root);
-
-
-	
 
     return 0;
 }
